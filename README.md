@@ -5,19 +5,29 @@
 
 ## 二、实现
 1. 新增dubbo的filter将异常包装成统一返回体，将异常状态码定义为>=500的值(与HttpStatus相对应)。并定义相关的状态码，并修改SentinelResourceAspect实现，判断返回的状态码是否为>=500，如果是则进行熔断统计。
-2. 并新增sentinel-starter，进行自动配置化。
+2. 并新增sentinel-dubbo-starter，进行自动配置化。
 
 ## 三、使用
-1.加入相关的依赖
+1.运行sentinel-dubbo-dashboard
+```
+相关配置
+sentinel.application.name=sentinel-dashboard # 名字
+sentinel.application.port=8719 # 数据端口
+sentinel.application.dashboard=localhost:8181 # 控制台地址
+sentinel.zookeeper.enable=true # 是否开启zookeeper作为datasource
+sentinel.zookeeper.address=localhost:2181 # zookeeper配置
+```
+运行DashboardApplication
+
+2.客户端加入相关的依赖
 ```
 <dependency>
     <groupId>com.xmutca</groupId>
-    <artifactId>sentinel-starter</artifactId>
+    <artifactId>sentinel-dubbo-starter</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 </dependency>
 ```
-
-2.加入相关的配置
+客户端加入相关的配置
 ```
 sentinel:
   application:
