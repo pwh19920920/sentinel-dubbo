@@ -1,0 +1,36 @@
+*~
+.class
+
+
+# idea
+.idea/
+.gradle/
+build/
+*.iml
+*.ipr
+*.iws
+
+# Eclipse
+bin/
+gen/
+.settings/
+.project
+.classpath
+
+# maven
+target/
+*.war
+*.zip
+*.tar
+*.tar.gz
+
+# temp
+*.log
+*.cache
+*.diff
+*.patch
+*.tmp
+
+# system
+.DS_Store
+Thumbs.db

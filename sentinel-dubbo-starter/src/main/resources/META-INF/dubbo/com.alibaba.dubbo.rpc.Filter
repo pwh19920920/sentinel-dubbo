@@ -1,0 +1,2 @@
+customerExceptionWrapFilter=com.xmutca.sentinel.dubbo.starter.filter.CustomerExceptionWrapFilter
+providerExceptionWrapFilter=com.xmutca.sentinel.dubbo.starter.filter.ProviderExceptionWrapFilter

@@ -1,0 +1,47 @@
+spring:
+  main:
+    web-application-type: none # 代表此服务不注册为web系统
+  application:
+    name: sentinel-provider
+
+
+dubbo:
+  application:
+    id: sentinel-provider
+    name: sentinel-provider
+    version: 1.0.0
+    qos-enable: false
+  scan:
+    basePackages: com.xmutca.**.facade
+  protocol:
+    id: dubbo
+    name: dubbo
+    port: 21880
+  registry:
+    id: registry
+    address: 127.0.0.1:2181
+    protocol: zookeeper
+
+
+management:
+  health:
+    dubbo.status.defaults: memory
+    dubbo.status.extras: load,threadpool
+  endpoint:
+    dubbo.enable: ture
+    dubbo-configs.enabled: true
+    dubbo-services.enabled: true
+    dubbo-references.enabled: true
+    dubbo-properties.enabled: true
+
+logging:
+  file: logs/${spring.application.name}-log
+
+sentinel:
+  application:
+    name: sentinel-provider
+    port: 8719
+    dashboard: localhost:8181
+  zookeeper:
+    enable: true
+    address: localhost:2181

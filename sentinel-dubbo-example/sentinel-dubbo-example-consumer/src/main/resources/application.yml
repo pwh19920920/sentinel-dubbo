@@ -1,0 +1,28 @@
+server:
+  port: 8082
+spring:
+  application:
+    name: sentinel-consumer
+
+dubbo:
+  application:
+    id: sentinel-consumer
+    name: sentinel-consumer
+  registry:
+    id: registry
+    address: 127.0.0.1:2181
+    protocol: zookeeper
+
+logging:
+  file: logs/${spring.application.name}-log
+  level:
+    com.alibaba: debug
+
+sentinel:
+  application:
+    name: sentinel-consumer
+    port: 8719
+    dashboard: localhost:8181
+  zookeeper:
+    enable: true
+    address: localhost:2181
