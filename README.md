@@ -67,7 +67,47 @@ sentinel:
     enable: true # 是否使用zookeeper作为datasource
     address: localhost:2181 # zookeeper的地址
 ```
-## 六、思考
+## 六、异常处理
+项目采用反射的形式获取注入的全部异常信息，写法类似于SpringMVC的ExceptionHandler。
+```
+/**
+ * @version Revision: 0.0.1
+ * @author: weihuang.peng
+ * @Date: 2018-12-24
+ */
+public class ExceptionHandler {
+
+    /**
+     * 默认异常
+     * @param ex
+     * @return
+     */
+    @ExceptionProcessor(Exception.class)
+    public Result handleException(Exception ex) {
+        return Result.DEFAULT_ERROR_RESULT;
+    }
+
+    /**
+     * 业务异常处理
+     * @param ex
+     * @return
+     */
+    @ExceptionProcessor({ServiceException.class})
+    public Result handleServiceException(ServiceException ex) {
+        Receipt result = ex.getExceptionResult();
+        result.setMessage("项目的实现 -》" + result.getMessage());
+        return result;
+    }
+}
+```
+然后通过以下形式进行异常注册：
+```
+ExceptionRegistry.updateForPackage("你的异常中心放的包名")
+```
+
+注意：后面注册的异常处理方法，将会覆盖前面注册的异常处理方法，覆盖依据为ExceptionProcessor中的value类名，处理的是你如果不存在此异常将会从父异常进行搜索，如果实在找不到将会用默认的进行输出。
+
+## 七、思考
 1. sentinel针对问题1其实也可以采用直接抛异常的方式，然后在SentinelResourceAspect实现中对业务异常进行排除。没有用这个方案的主要原因是考虑到dubbo也有可能直接对外提供服务（如dubbo2.js），直接抛出异常的方式实在是太过粗暴，也不太友好。
 2. sentinel客户端使用datasource需要控制台的相关支持，举个例子就是zookeeper的path要一一对应才能获取相关配置，因此也改了一版的dashboard。
 3. 项目中对外服务中异常的处理：如果是通过dubbo本身调用抛的异常，用dubbo的filter对异常进行了包装，如果是集成了web服务以后，http服务抛出来的异常可以使用ControllerAdvice来做相关异常处理。
