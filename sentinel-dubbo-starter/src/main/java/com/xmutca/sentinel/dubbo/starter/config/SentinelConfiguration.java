@@ -20,6 +20,7 @@ import com.alibaba.csp.sentinel.util.StringUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.xmutca.sentinel.dubbo.starter.aspect.SentinelResourceExtendAspect;
+import com.xmutca.sentinel.dubbo.starter.reflect.ExceptionRegistry;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -52,6 +53,11 @@ public class SentinelConfiguration implements InitializingBean {
 
     @Autowired
     private Environment env;
+
+    // 为了让默认异常注册代码优先执行
+    static {
+        ExceptionRegistry.updateForPackage("com.xmutca.sentinel.dubbo.starter.exception");
+    }
 
     /**
      * 熔断器注解支持
@@ -97,6 +103,9 @@ public class SentinelConfiguration implements InitializingBean {
         }
     }
 
+    /**
+     * zookeeper的datasource注册
+     */
     @Configuration
     @ConditionalOnProperty(name = "sentinel.zookeeper.enable", havingValue = "true")
     public class ZookeeperDataSourceConfiguration implements InitializingBean {

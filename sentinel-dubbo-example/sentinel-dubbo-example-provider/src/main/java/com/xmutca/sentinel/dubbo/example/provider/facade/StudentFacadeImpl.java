@@ -3,8 +3,9 @@ package com.xmutca.sentinel.dubbo.example.provider.facade;
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.alibaba.dubbo.config.annotation.Service;
-import com.xmutca.sentinel.dubbo.example.api.facade.StudentFacade;
+import com.xmutca.sentinel.dubbo.core.exception.ServiceException;
 import com.xmutca.sentinel.dubbo.core.result.Result;
+import com.xmutca.sentinel.dubbo.example.api.facade.StudentFacade;
 
 import java.util.Random;
 
@@ -27,7 +28,7 @@ public class StudentFacadeImpl implements StudentFacade {
     @SentinelResource(fallback = "sayHelloFallback", blockHandler = "sayHelloBlockHandler")
     public Result<String> sayHello(String name) {
         if (random.nextBoolean()) {
-            throw new RuntimeException("故意抛异常");
+            throw new ServiceException("故意抛异常");
         }
         return new Result<>("Hello World: -> " + name);
     }

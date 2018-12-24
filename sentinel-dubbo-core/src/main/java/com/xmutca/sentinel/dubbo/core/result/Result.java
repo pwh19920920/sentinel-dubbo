@@ -15,6 +15,9 @@ import java.util.Optional;
  */
 public class Result<T> implements Serializable {
 
+    // 默认
+    public final static Result DEFAULT_ERROR_RESULT = new Result<>(Result.Status.ERROR, "系统开小差，熔断降级处理。");
+
     public enum Status {
 
         /**
