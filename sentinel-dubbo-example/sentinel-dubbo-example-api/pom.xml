@@ -6,7 +6,7 @@
 		<groupId>com.xmutca</groupId>
 		<artifactId>sentinel-dubbo-parent</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath>../../pom.xml</relativePath> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.xmutca</groupId>
 	<artifactId>sentinel-dubbo-example-api</artifactId>

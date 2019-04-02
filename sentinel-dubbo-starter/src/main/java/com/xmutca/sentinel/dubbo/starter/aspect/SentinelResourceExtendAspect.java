@@ -50,7 +50,7 @@ public class SentinelResourceExtendAspect extends AbstractSentinelAspectSupport 
         } catch (BlockException ex) {
             return handleBlockException(pjp, annotation, ex);
         } catch (Throwable ex) {
-            Tracer.trace(ex);
+            traceException(ex, annotation);
             throw ex;
         } finally {
             if (entry != null) {
