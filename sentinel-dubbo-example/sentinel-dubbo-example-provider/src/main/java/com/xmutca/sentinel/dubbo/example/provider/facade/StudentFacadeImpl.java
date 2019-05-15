@@ -25,10 +25,10 @@ public class StudentFacadeImpl implements StudentFacade {
     private static Random random = new Random();
 
     @Override
-    @SentinelResource(fallback = "sayHelloFallback", blockHandler = "sayHelloBlockHandler")
+   // @SentinelResource(fallback = "sayHelloFallback", blockHandler = "sayHelloBlockHandler")
     public Result<String> sayHello(String name) {
         if (random.nextBoolean()) {
-            throw new ServiceException("故意抛异常");
+          //  throw new RuntimeException("故意抛异常");
         }
         return new Result<>("Hello World: -> " + name);
     }
@@ -40,7 +40,7 @@ public class StudentFacadeImpl implements StudentFacade {
      * @return
      */
     public Result<String> sayHelloFallback(String name) {
-        System.out.println("consumer sayHelloFallback");
+        System.out.println("provider sayHelloFallback");
         return new Result<>(Result.Status.ERROR, "provider sayHelloFallback -> " + name);
     }
 
@@ -52,7 +52,7 @@ public class StudentFacadeImpl implements StudentFacade {
      * @return
      */
     public Result<String> sayHelloBlockHandler(String name, BlockException ex) {
-        System.out.println("consumer sayHelloBlockHandler");
-        return new Result<>(Result.Status.ERROR, "provider sayHelloBlockHandler -> " + name);
+        System.out.println("provider sayHelloBlockHandler");
+        return new Result<>(Result.Status.TOO_MANY_REQUESTS, "provider sayHelloBlockHandler -> " + name);
     }
 }

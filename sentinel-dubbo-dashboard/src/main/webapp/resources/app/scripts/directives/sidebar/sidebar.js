@@ -22,9 +22,19 @@ angular.module('sentinelDashboardApp')
             if (data.code === 0) {
               let initHashApp = $location.path().split('/')[3];
               $scope.apps = data.data;
-              $scope.apps.forEach(function (item) {
+              $scope.apps = $scope.apps.map(function (item) {
                 if (item.app === initHashApp) {
                   item.active = true;
+                }
+                var heathyCount = 0;
+                for (var i in item.machines) {
+                  if (item.machines[i].healthy) {
+                      heathyCount++;
+                  }
+                }
+                item.heathyCount = heathyCount;
+                if (item.shown) {
+                  return item;
                 }
               });
             }

@@ -23,16 +23,57 @@ angular
     'selectize',
     'angularUtils.directives.dirPagination'
   ])
-  .config(['$stateProvider', '$urlRouterProvider', '$ocLazyLoadProvider',
-    function ($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
-    $ocLazyLoadProvider.config({
-      debug: false,
-      events: true,
-    });
+  .factory('AuthInterceptor', ['$window', '$state', function ($window, $state) {
+    var authInterceptor = {
+      'responseError' : function(response) {
+        if (response.status == 401) {
+          // If not auth, clear session in localStorage and jump to the login page
+          $window.localStorage.removeItem("session_sentinel_admin");
+          $state.go('login');
+        }
 
-    $urlRouterProvider.otherwise('/dashboard/home');
+        return response;
+      },
+      'response' : function(response) {
+        return response;
+      },
+      'request' : function(config) {
+        return config;
+      },
+      'requestError' : function(config){
+        return config;
+      }
+    };
+    return authInterceptor;
+  }])
+  .config(['$stateProvider', '$urlRouterProvider', '$ocLazyLoadProvider', '$httpProvider',
+    function ($stateProvider, $urlRouterProvider, $ocLazyLoadProvider, $httpProvider) {
+      $httpProvider.interceptors.push('AuthInterceptor');
 
-    $stateProvider
+      $ocLazyLoadProvider.config({
+        debug: false,
+        events: true,
+      });
+
+      $urlRouterProvider.otherwise('/dashboard/home');
+
+      $stateProvider
+        .state('login', {
+            url: '/login',
+            templateUrl: 'app/views/login.html',
+            controller: 'LoginCtl',
+            resolve: {
+                loadMyFiles: ['$ocLazyLoad', function ($ocLazyLoad) {
+                    return $ocLazyLoad.load({
+                        name: 'sentinelDashboardApp',
+                        files: [
+                            'app/scripts/controllers/login.js',
+                        ]
+                    });
+                }]
+            }
+        })
+
       .state('dashboard', {
         url: '/dashboard',
         templateUrl: 'app/views/dashboard/main.html',
@@ -67,15 +108,15 @@ angular
       })
 
       .state('dashboard.flowV1', {
-        templateUrl: 'app/views/flow_old.html',
-        url: '/v1/flow/:app',
+        templateUrl: 'app/views/flow_v1.html',
+        url: '/flow/:app',
         controller: 'FlowControllerV1',
         resolve: {
           loadMyFiles: ['$ocLazyLoad', function ($ocLazyLoad) {
             return $ocLazyLoad.load({
               name: 'sentinelDashboardApp',
               files: [
-                'app/scripts/controllers/flow_old.js',
+                'app/scripts/controllers/flow_v1.js',
               ]
             });
           }]
@@ -83,15 +124,15 @@ angular
       })
 
         .state('dashboard.flow', {
-            templateUrl: 'app/views/flow.html',
-            url: '/flow/:app',
-            controller: 'FlowController',
+            templateUrl: 'app/views/flow_v2.html',
+            url: '/v2/flow/:app',
+            controller: 'FlowControllerV2',
             resolve: {
                 loadMyFiles: ['$ocLazyLoad', function ($ocLazyLoad) {
                     return $ocLazyLoad.load({
                         name: 'sentinelDashboardApp',
                         files: [
-                            'app/scripts/controllers/flow.js',
+                            'app/scripts/controllers/flow_v2.js',
                         ]
                     });
                 }]
@@ -114,16 +155,64 @@ angular
         }
       })
 
-        .state('dashboard.clusterAll', {
-            templateUrl: 'app/views/cluster.html',
-            url: '/cluster/:app',
-            controller: 'SentinelClusterController',
+        .state('dashboard.clusterAppAssignManage', {
+            templateUrl: 'app/views/cluster_app_assign_manage.html',
+            url: '/cluster/assign_manage/:app',
+            controller: 'SentinelClusterAppAssignManageController',
             resolve: {
                 loadMyFiles: ['$ocLazyLoad', function ($ocLazyLoad) {
                     return $ocLazyLoad.load({
                         name: 'sentinelDashboardApp',
                         files: [
-                            'app/scripts/controllers/cluster.js',
+                            'app/scripts/controllers/cluster_app_assign_manage.js',
+                        ]
+                    });
+                }]
+            }
+        })
+
+        .state('dashboard.clusterAppServerList', {
+            templateUrl: 'app/views/cluster_app_server_list.html',
+            url: '/cluster/server/:app',
+            controller: 'SentinelClusterAppServerListController',
+            resolve: {
+                loadMyFiles: ['$ocLazyLoad', function ($ocLazyLoad) {
+                    return $ocLazyLoad.load({
+                        name: 'sentinelDashboardApp',
+                        files: [
+                            'app/scripts/controllers/cluster_app_server_list.js',
+                        ]
+                    });
+                }]
+            }
+        })
+
+        .state('dashboard.clusterAppClientList', {
+            templateUrl: 'app/views/cluster_app_client_list.html',
+            url: '/cluster/client/:app',
+            controller: 'SentinelClusterAppTokenClientListController',
+            resolve: {
+                loadMyFiles: ['$ocLazyLoad', function ($ocLazyLoad) {
+                    return $ocLazyLoad.load({
+                        name: 'sentinelDashboardApp',
+                        files: [
+                            'app/scripts/controllers/cluster_app_token_client_list.js',
+                        ]
+                    });
+                }]
+            }
+        })
+
+        .state('dashboard.clusterSingle', {
+            templateUrl: 'app/views/cluster_single_config.html',
+            url: '/cluster/single/:app',
+            controller: 'SentinelClusterSingleController',
+            resolve: {
+                loadMyFiles: ['$ocLazyLoad', function ($ocLazyLoad) {
+                    return $ocLazyLoad.load({
+                        name: 'sentinelDashboardApp',
+                        files: [
+                            'app/scripts/controllers/cluster_single.js',
                         ]
                     });
                 }]

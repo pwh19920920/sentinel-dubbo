@@ -45,3 +45,7 @@ sentinel:
   zookeeper:
     enable: true
     address: localhost:2181
+  nacos:
+    enable: false
+    server_addr: localhost:8888
+    group_id: DEFAULT_GROUP

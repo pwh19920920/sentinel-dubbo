@@ -43,6 +43,11 @@
 
 		<dependency>
 			<groupId>com.alibaba.csp</groupId>
+			<artifactId>sentinel-datasource-nacos</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.alibaba.csp</groupId>
 			<artifactId>sentinel-web-servlet</artifactId>
 		</dependency>
 
@@ -80,6 +85,12 @@
 		<dependency>
 			<groupId>org.reflections</groupId>
 			<artifactId>reflections</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 </project>

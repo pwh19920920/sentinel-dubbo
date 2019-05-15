@@ -27,4 +27,17 @@ public abstract class BaseException extends RuntimeException {
     public Receipt getExceptionResult() {
         return new Receipt(getStatus(), getMessage());
     }
+
+    /**
+     * 获取回执
+     * @return
+     */
+    public static BaseException getInstance(Result receipt) {
+        return new BaseException(receipt.getMessage()) {
+            @Override
+            public Result.Status getStatus() {
+                return receipt.getStatusEnum();
+            }
+        };
+    }
 }

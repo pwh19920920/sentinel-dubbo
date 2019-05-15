@@ -25,6 +25,11 @@ public class SentinelProperties {
     private ZookeeperProperties zookeeper;
 
     /**
+     * nacos配置中心
+     */
+    private NacosProperties nacos;
+
+    /**
      * 应用配置
      */
     @Getter
@@ -79,5 +84,44 @@ public class SentinelProperties {
          * 是否开启
          */
         private boolean enable;
+    }
+
+    /**
+     * nacos配置文件
+     */
+    public static class NacosProperties {
+
+        /**
+         * nacos配置中心地址
+         */
+        private String serverAddr;
+
+        /***
+         * 分组ID
+         */
+        private String groupId;
+
+        public String getGroupId() {
+            return groupId;
+        }
+
+        public void setGroupId(String groupId) {
+            this.groupId = groupId;
+        }
+
+        public String getServerAddr() {
+            return serverAddr;
+        }
+
+        public void setServerAddr(String serverAddr) {
+            this.serverAddr = serverAddr;
+        }
+    }
+
+    public ApplicationProperties getApplication() {
+        if (null == application) {
+            application = new ApplicationProperties();
+        }
+        return application;
     }
 }

@@ -15,7 +15,9 @@ import java.util.Optional;
  */
 public class Result<T> implements Serializable {
 
-    // 默认
+    /**
+     * 默认
+     */
     public final static Result DEFAULT_ERROR_RESULT = new Result<>(Result.Status.ERROR, "系统开小差，熔断降级处理。");
 
     public enum Status {
@@ -61,9 +63,19 @@ public class Result<T> implements Serializable {
         REQUEST_TIMEOUT(408),
 
         /**
+         * 请求过多降级
+         */
+        TOO_MANY_REQUESTS(429),
+
+        /**
          * 业务访问失败
          */
         ERROR(500),
+
+        /**
+         * 请求失败
+         */
+        BAD_GATEWAY(502),
 
         /**
          * 网关超时
@@ -162,6 +174,14 @@ public class Result<T> implements Serializable {
 
     public int getStatus() {
         return status.getCode();
+    }
+
+    public Status getStatusEnum() {
+        return status;
+    }
+
+    public void setStatusEnum(Status status) {
+        this.status = status;
     }
 
     public void setStatus(int status) {
