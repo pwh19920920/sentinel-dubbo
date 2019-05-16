@@ -9,9 +9,10 @@ Sentinel 是阿里中间件团队开源的，面向分布式服务架构的轻�
 3. Sentinel Dashboard不支持将配置发送到datasource中，需要进行一定的改造。
 
 ## 三、实现
-1. 新增dubbo的filter将异常包装成统一返回体，将异常状态码定义为>=500的值(与HttpStatus相对应)。并定义相关的状态码，并修改SentinelResourceAspect实现，判断返回的状态码是否为>=500，如果是则进行熔断统计。
-2. 并新增sentinel-dubbo-starter，进行自动配置化。
-3. Sentinel Dashboard改造：控制台规则 -> 配置中心 -> 客户端。
+1. 新增dubbo的filter将异常包装成统一返回体，将普通异常状态码定义为>=500的值，限流异常BlockException状态码为429(也与HttpStatus相对应)。
+2. 实现过程中定义相关的状态码，修改SentinelResourceAspect实现，判断返回的状态码是否为429, 如果是则进行handleBlock异常处理；如果>=500，如果是则进行熔断统计。
+3. 并新增sentinel-dubbo-starter，进行自动配置化。
+4. Sentinel Dashboard改造：控制台规则 -> 配置中心 -> 客户端。
 
 ## 四、Dashboard改造
 ### 改造前
@@ -22,12 +23,19 @@ Sentinel 是阿里中间件团队开源的，面向分布式服务架构的轻�
 客户端注册到相关的注册中心中，Sentinel Dashboard控制台将配置信息推送到配置中心，如nacos，zookeeper中，由配置中心去进行配置推送。
 ![改造后](https://user-images.githubusercontent.com/9434884/45406233-645e8380-b698-11e8-8199-0c917403238f.png)
 
-### 路径约定
+### zookeeper路径约定
 1. 流量控制规则：/sentinel/rules/{appName}/flow
 2. 黑白名单规则：/sentinel/rules/{appName}/authority
 3. 熔断降级规则：/sentinel/rules/{appName}/degrade
 4. 热点参数规则：/sentinel/rules/{appName}/param
 5. 负载保护规则：/sentinel/rules/{appName}/system
+
+### nacos路径约定
+1. 流量控制规则：{appName}_flow
+2. 黑白名单规则：{appName}_authority
+3. 熔断降级规则：{appName}_degrade
+4. 热点参数规则：{appName}_param
+5. 负载保护规则：{appName}_system
 
 ### 改造支持
 1. 改造后Sentinel Dashboard支持api推送以及zookeeper推送。
@@ -43,8 +51,15 @@ DynamicRuleZookeeperPublisher
 sentinel.application.name=sentinel-dashboard # 名字
 sentinel.application.port=8719 # sentinel的http访问端口
 sentinel.application.dashboard=localhost:8181 # 控制台地址
+
+sentinel.api.enable=false #是否开启api推送，选择false则zookeeper，nacos二选一
+
 sentinel.zookeeper.enable=true # 是否开启zookeeper作为datasource
 sentinel.zookeeper.address=localhost:2181 # zookeeper配置
+
+sentinel.nacos.enable=false # 是否开启nacos作为datasource
+sentinel.nacos.server_addr=localhost:8888 # nacos地址
+sentinel.nacos.group_id=DEFAULT_GROUP # group分组，如果不设置则默认是SENTINEL_GROUP
 ```
 配置并运行DashboardApplication
 
@@ -66,6 +81,10 @@ sentinel:
   zookeeper:
     enable: true # 是否使用zookeeper作为datasource
     address: localhost:2181 # zookeeper的地址
+  nacos:
+    enable: false # 是否开启nacos作为datasource
+    server_addr: localhost:8888 # nacos地址
+    group_id: DEFAULT_GROUP # group分组，如果不设置则默认是SENTINEL_GROUP
 ```
 ## 六、异常处理
 项目采用反射的形式获取注入的全部异常信息，写法类似于SpringMVC的ExceptionHandler。

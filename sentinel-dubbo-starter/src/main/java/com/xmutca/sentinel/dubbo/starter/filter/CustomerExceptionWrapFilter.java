@@ -4,10 +4,13 @@ import com.alibaba.csp.sentinel.Entry;
 import com.alibaba.csp.sentinel.EntryType;
 import com.alibaba.csp.sentinel.SphU;
 import com.alibaba.csp.sentinel.Tracer;
+import com.alibaba.csp.sentinel.context.ContextUtil;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
+import com.alibaba.csp.sentinel.slots.block.flow.FlowException;
 import com.alibaba.dubbo.common.Constants;
 import com.alibaba.dubbo.common.extension.Activate;
 import com.alibaba.dubbo.rpc.*;
+import com.alibaba.nacos.client.utils.AppNameUtils;
 import com.xmutca.sentinel.dubbo.core.exception.BaseException;
 import com.xmutca.sentinel.dubbo.starter.reflect.ExceptionMethodExecute;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +37,8 @@ public class CustomerExceptionWrapFilter extends AbstractDubboFilter implements 
         Entry methodEntry = null;
         try {
             String resourceName = getResourceName(invoker, invocation);
+            ContextUtil.enter(resourceName, application);
+
             interfaceEntry = SphU.entry(invoker.getInterface().getName(), EntryType.OUT);
             methodEntry = SphU.entry(resourceName, EntryType.OUT);
 
@@ -43,6 +48,10 @@ public class CustomerExceptionWrapFilter extends AbstractDubboFilter implements 
             // 判断是否需要抛异常
             if (valObj instanceof com.xmutca.sentinel.dubbo.core.result.Result) {
                 com.xmutca.sentinel.dubbo.core.result.Result receipt = (com.xmutca.sentinel.dubbo.core.result.Result) valObj;
+                if (receipt.getStatusEnum() == com.xmutca.sentinel.dubbo.core.result.Result.Status.TOO_MANY_REQUESTS) {
+                    throw new FlowException(AppNameUtils.getAppName());
+                }
+
                 if (receipt.getStatus() >= com.xmutca.sentinel.dubbo.core.result.Result.Status.ERROR.getCode()) {
                     throw BaseException.getInstance(receipt);
                 }
@@ -61,6 +70,7 @@ public class CustomerExceptionWrapFilter extends AbstractDubboFilter implements 
             if (interfaceEntry != null) {
                 interfaceEntry.exit();
             }
+            ContextUtil.exit();
         }
     }
 }

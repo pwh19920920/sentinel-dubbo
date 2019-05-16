@@ -8,6 +8,7 @@ import com.alibaba.csp.sentinel.adapter.servlet.callback.RequestOriginParser;
 import com.alibaba.csp.sentinel.adapter.servlet.callback.UrlCleaner;
 import com.alibaba.csp.sentinel.adapter.servlet.callback.WebCallbackManager;
 import com.alibaba.csp.sentinel.adapter.servlet.util.FilterUtil;
+import com.alibaba.csp.sentinel.context.ContextUtil;
 import com.alibaba.csp.sentinel.log.RecordLog;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.alibaba.csp.sentinel.util.StringUtil;
@@ -56,6 +57,8 @@ public class SentinelRequestMappingAspect {
                 uriTarget = urlCleaner.clean(uriTarget);
             }
             RecordLog.info(String.format("[Sentinel Pre Filter] Origin: %s enter Uri Path: %s", origin, uriTarget));
+
+            ContextUtil.enter(uriTarget, origin);
             entry = SphU.entry(uriTarget, EntryType.IN);
 
             // 被保护的业务逻辑
@@ -78,6 +81,7 @@ public class SentinelRequestMappingAspect {
             if (entry != null) {
                 entry.exit();
             }
+            ContextUtil.exit();
         }
     }
 

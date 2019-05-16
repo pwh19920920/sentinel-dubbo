@@ -34,7 +34,6 @@ public class ProviderExceptionWrapFilter extends AbstractDubboFilter implements 
             String resourceName = getResourceName(invoker, invocation);
             String interfaceName = invoker.getInterface().getName();
             ContextUtil.enter(resourceName, application);
-            System.out.println(resourceName + interfaceName);
             interfaceEntry = SphU.entry(interfaceName, EntryType.IN);
             methodEntry = SphU.entry(resourceName, EntryType.IN, 1, invocation.getArguments());
             return invoker.invoke(invocation);
